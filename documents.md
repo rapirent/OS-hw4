@@ -1,24 +1,4 @@
-# OS-hw4
-## summary
--  author:丁國騰(Kuo Teng, Ding)
--  student_id:E94036209
--  class:資工三乙
--  title:hw4
-
-##  Usage:
--  makefile:
-
-```
-  gcc -o hw4 hw4.c
-```
-
-- start the program:
-    - use redirecte（資料流重導向）
-```
-    ./hw4 < [input_file] > [output_file]
-```
-
-## place replacement policies' pros and cons:
+## documents
 
 ### LRU
 
