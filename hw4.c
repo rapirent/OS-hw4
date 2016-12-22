@@ -174,7 +174,13 @@ int main(void)
                 }
                 else if(policy==3)
                 {
-                    evicted_vpn=(rand()%vp_number)+1;
+                	evicted_vpn=(rand()%vp_number)+1;
+                	while(VPN[evicted_vpn].in_use!=1||VPN[evicted_vpn].present==0)
+                	{
+                		evicted_vpn=(rand()%vp_number)+1;
+                	}
+                	// while((evited_vpn=(rand())%vp_number)+1)&&VPN[reference]
+                    // evicted_vpn=(rand()%vp_number)+1;
                     source = VPN[reference].PFN;
                     VPN[reference].PFN = VPN[evicted_vpn].PFN;
                     VPN[reference].present = 1;
