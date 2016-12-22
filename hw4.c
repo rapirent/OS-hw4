@@ -9,6 +9,7 @@ struct page{
     int in_use;
     int present;
     int lru;
+    int lfu;
 };
 struct page VPN[MAX_VP];
 struct node{
@@ -45,6 +46,10 @@ int main(void)
     {
         policy = 3;
     }
+    else if(strcmp(policy_str, "LFU")==0)
+    {
+    	policy = 4;
+    }
     struct node* queue_top = NULL;
     struct node* queue_last = NULL;
     //queue:queue_top->3->2->queue_last
@@ -61,6 +66,7 @@ int main(void)
         VPN[clean].in_use = 0;
         VPN[clean].present = 0;
         VPN[clean].lru = 0;
+        VPN[clean].lfu = 0;
     }
     fgets(tmp,1000,stdin);
     memset(tmp, 0, sizeof(tmp));
@@ -76,6 +82,7 @@ int main(void)
         VPN[reference].in_use = 1;
         reference_count = reference_count + 1;
         VPN[reference].lru = reference_count;
+        VPN[reference].lfu = VPN[reference].lfu + 1;
         if(VPN[reference].present==1)
         {
             //hit
@@ -132,7 +139,8 @@ int main(void)
                     VPN[reference].PFN = VPN[evicted_vpn].PFN;
                     VPN[reference].present = 1;
                     VPN[evicted_vpn].present = 0;
-                    VPN[evicted_vpn].lru = 0;
+                    VPN[evicted_vpn].lru = 0;//XXX
+                    VPN[evicted_vpn].lfu = 0;//XXX
                     VPN[evicted_vpn].PFN = destination;
                     struct node* new_node = malloc(sizeof(struct node));
                     new_node->virtual_number = reference;
@@ -162,6 +170,7 @@ int main(void)
                     VPN[evicted_vpn].PFN = destination;
                     VPN[evicted_vpn].present = 0;
                     VPN[evicted_vpn].lru = 0;
+                    VPN[evicted_vpn].lfu = 0;
                 }
                 else if(policy==3)
                 {
@@ -172,6 +181,28 @@ int main(void)
                     VPN[evicted_vpn].PFN = destination;
                     VPN[evicted_vpn].present = 0;
                     VPN[evicted_vpn].lru = 0;
+                    VPN[evicted_vpn].lfu = 0;
+                }
+                else if(policy==4)
+                {
+                    int compare_number = reference_count, less_number = 0;
+                    int traversal = 0;
+                    for(;traversal<vp_number;traversal++)
+                    {
+                        if(VPN[traversal].lfu<compare_number&&VPN[traversal].lfu!=0)
+                        {
+                            compare_number = VPN[traversal].lfu;
+                            less_number = traversal;
+                        }
+                    }
+                    evicted_vpn = less_number;
+                    source = VPN[reference].PFN;
+                    VPN[reference].PFN = VPN[evicted_vpn].PFN;
+                    VPN[reference].present = 1;//TODO
+                    VPN[evicted_vpn].PFN = destination;
+                    VPN[evicted_vpn].present = 0;
+                    VPN[evicted_vpn].lru = 0;
+                    VPN[evicted_vpn].lfu = 0;
                 }
                 disk[source] = 0;
                 disk[destination] = 1;
